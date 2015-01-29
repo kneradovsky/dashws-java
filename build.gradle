@@ -1,0 +1,39 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'war'
+apply plugin: 'jetty'
+group 'ru.kn.dashws-java'
+version '1.0'
+
+
+repositories {
+   mavenCentral()
+}
+dependencies {
+	compile 'com.google.code.gson:gson:2.3.1'
+	compile 'org.apache.tomcat:tomcat-websocket:8.0.18'
+	testCompile 'junit:junit:4.11'
+	testCompile 'com.jayway.restassured:rest-assured:2.4.0', 'org.hamcrest:java-hamcrest:2.0.0.0'
+
+	providedRuntime 'org.apache.tomcat:tomcat-websocket:8.0.18'
+
+}
+
+task stopJettyServer << {
+    jettyStop.stopPort=9090
+    jettyStop.stopKey='key1'
+    jettyStop.execute()
+}
+
+test {
+	doFirst {
+        jettyRunWar.httpPort = 8080    // Port for test
+        jettyRunWar.daemon = true
+        jettyRunWar.execute()
+    }
+}
+
+test.finalizedBy stopJettyServer
+
+stopPort=9090
+stopKey='key1'
