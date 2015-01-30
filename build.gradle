@@ -12,6 +12,7 @@ repositories {
 dependencies {
 	compile 'com.google.code.gson:gson:2.3.1'
 	compile 'org.apache.tomcat:tomcat-websocket:8.0.18'
+	compile 'ch.qos.logback:logback-classic:1.0.13'
 	testCompile 'junit:junit:4.11'
 	testCompile 'com.jayway.restassured:rest-assured:2.4.0', 'org.hamcrest:java-hamcrest:2.0.0.0'
 

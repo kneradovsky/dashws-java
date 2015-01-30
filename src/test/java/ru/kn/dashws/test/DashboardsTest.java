@@ -61,7 +61,7 @@ public class DashboardsTest {
 	}
 	@Test
 	public void oneDashboard() throws IOException, InterruptedException {
-		//send data before subscriptio
+		//send data before subscription
 
 		//send subscribe
 		Gson gs = new Gson();
