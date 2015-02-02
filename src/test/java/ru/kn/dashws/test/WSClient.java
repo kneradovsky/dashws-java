@@ -18,7 +18,7 @@ import javax.websocket.Session;
 @ClientEndpoint
 class WSClient {
 	static final int TIMEOUT=5000;
-	static final String AUTH_TOKEN="token1234";
+	static final String AUTH_TOKEN="token";
 	Semaphore onOpen,onMessage,onClose,onError;
 	Session sess;
 	BlockingQueue<String> messages = new LinkedBlockingQueue<>();

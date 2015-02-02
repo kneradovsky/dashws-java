@@ -26,11 +26,11 @@ import com.google.gson.Gson;
 
 
 public class SubscribtionsTest {
-	private WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-	private WSClient client;
+	private static WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+	private static WSClient client;
 	
 	@BeforeClass
-	public void connectWs() throws DeploymentException, IOException, URISyntaxException, InterruptedException {
+	public static void connectWs() throws DeploymentException, IOException, URISyntaxException, InterruptedException {
 		client = new WSClient();
 		container.connectToServer(client, new URI("ws://localhost:8080/websocket/connection"));
 		String message=null;
@@ -51,9 +51,9 @@ public class SubscribtionsTest {
 	@Test
 	public void receiveLastEvents() throws IOException, InterruptedException {
 		//send data before subscriptio
-		given().with().body("{\"auth_token\":\"token1243\",\"data\":\"a1\"}").post("/data/d1")
+		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"data\":\"a1\"}").post("/data/d1")
 		.then().assertThat().statusCode(204);
-		given().with().body("{\"auth_token\":\"token1243\",\"data\":\"a2\"}").post("/data/d2")
+		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"data\":\"a2\"}").post("/data/d2")
 		.then().assertThat().statusCode(204);
 		//send subscribe
 		Gson gs = new Gson();
@@ -83,9 +83,9 @@ public class SubscribtionsTest {
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 
-		given().with().body("{\"auth_token\":\"token1243\",\"data\":\"a1\"}").post("/data/d3")
+		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"data\":\"a1\"}").post("/data/d3")
 		.then().assertThat().statusCode(204);
-		given().with().body("{\"auth_token\":\"token1243\",\"data\":\"a2\"}").post("/data/d4")
+		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"data\":\"a2\"}").post("/data/d4")
 		.then().assertThat().statusCode(204);
 		
 		Message[] msgs=new Message[2];

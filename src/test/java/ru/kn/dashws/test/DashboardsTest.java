@@ -25,11 +25,11 @@ import com.google.gson.Gson;
 
 
 public class DashboardsTest {
-	private WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-	private WSClient client;
+	private static WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+	private static WSClient client;
 	
 	@BeforeClass
-	public void connectWs() throws DeploymentException, IOException, URISyntaxException, InterruptedException {
+	public static void connectWs() throws DeploymentException, IOException, URISyntaxException, InterruptedException {
 		client = new WSClient();
 		container.connectToServer(client, new URI("ws://localhost:8080/websocket/connection"));
 		String message=null;
@@ -52,7 +52,7 @@ public class DashboardsTest {
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 
-		given().with().body("{\"auth_token\":\"token1243\",\"event\":\"reload\"}").post("/dashboards/*")
+		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"event\":\"reload\"}").post("/dashboards/*")
 		.then().assertThat().statusCode(204);
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 		msg=gs.fromJson(strmsg, Message.class);
@@ -72,7 +72,7 @@ public class DashboardsTest {
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 
-		given().with().body("{\"auth_token\":\"token1243\",\"event\":\"reload\"}").post("/dashboards/db1")
+		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"event\":\"reload\"}").post("/dashboards/db1")
 		.then().assertThat().statusCode(204);
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 		msg=gs.fromJson(strmsg, Message.class);

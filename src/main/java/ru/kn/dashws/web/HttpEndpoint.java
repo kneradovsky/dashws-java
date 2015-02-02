@@ -15,6 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.kn.dashws.ws.WebSocketServer;
+import ru.kn.dashws.ws.WebSocketServerFactory;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -39,12 +42,14 @@ public class HttpEndpoint extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     private String auth_token;
     Logger logger = LoggerFactory.getLogger(HttpEndpoint.class);
+    final WebSocketServer wsserver;
     ExecutorService executor;
     /**
      * @see HttpServlet#HttpServlet()
      */
     public HttpEndpoint() {
         super();
+        wsserver=(WebSocketServer)WebSocketServerFactory.getServer();
     }
 
 	/**
@@ -75,8 +80,13 @@ public class HttpEndpoint extends HttpServlet {
 		String content=null;
 		while((content=request.getReader().readLine())!=null) builder.append(content);
 		JsonParser parser = new JsonParser();
+		content=builder.toString();
 		try {
 			JsonElement elem=parser.parse(content);
+			if(elem.isJsonNull()) {
+				response.sendError(400, "body is empry or not a valid json");
+				return;
+			}
 			final JsonObject obj = elem.getAsJsonObject();
 			if(obj.has("auth_token")) {
 				String req_auth_token=obj.get("auth_token").getAsString();
@@ -85,7 +95,7 @@ public class HttpEndpoint extends HttpServlet {
 					executor.submit(new Runnable()  {
 						@Override
 						public void run() {
-							WebSocketServer.send(id,obj,target);
+							wsserver.send(id,obj,target);
 						}
 					});
 				} else {
@@ -94,6 +104,8 @@ public class HttpEndpoint extends HttpServlet {
 			} else response.sendError(401, "No auth_token");
 		} catch(JsonParseException e1) {
 			response.sendError(400, "body is not a valid json");
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
 	}
 

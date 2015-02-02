@@ -1,9 +1,31 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'war'
-apply plugin: 'jetty'
+//apply plugin: 'jetty'
+apply plugin: 'org.akhikhl.gretty'
+
 group 'ru.kn.dashws-java'
 version '1.0'
+
+
+buildscript {
+  repositories {
+    jcenter()
+    // enable this to use snapshot versions of Gretty:
+    // maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
+  }
+
+  dependencies {
+    classpath 'org.akhikhl.gretty:gretty:+'
+  }
+}
+
+repositories {
+  jcenter()
+  // enable this to use snapshot versions of Gretty:
+  // maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local' }
+}
+
 
 
 repositories {
@@ -20,21 +42,14 @@ dependencies {
 
 }
 
-task stopJettyServer << {
-    jettyStop.stopPort=9090
-    jettyStop.stopKey='key1'
-    jettyStop.execute()
+
+gretty {
+  port=8080
+  contextPath="/"
+  integrationTestTask = 'test' // name of existing gradle task
+  //servletContainer="tomcat8"
 }
 
-test {
-	doFirst {
-        jettyRunWar.httpPort = 8080    // Port for test
-        jettyRunWar.daemon = true
-        jettyRunWar.execute()
-    }
-}
 
-test.finalizedBy stopJettyServer
-
-stopPort=9090
-stopKey='key1'
+//stopPort=9090
+//stopKey='key1'

@@ -25,11 +25,11 @@ import com.google.gson.Gson;
 
 
 public class HistoryTest {
-	private WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-	private WSClient client;
+	private static WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+	private static WSClient client;
 	
 	@BeforeClass
-	public void connectWs() throws DeploymentException, IOException, URISyntaxException, InterruptedException {
+	public static void connectWs() throws DeploymentException, IOException, URISyntaxException, InterruptedException {
 		client = new WSClient();
 		container.connectToServer(client, new URI("ws://localhost:8080/websocket/connection"));
 		String message=null;
@@ -41,9 +41,9 @@ public class HistoryTest {
 	@Test
 	public void receiveLastEvents() throws IOException, InterruptedException {
 		//send data before subscriptio
-		given().with().body("{\"auth_token\":\"token1243\",\"data1\":\"a1\"}").post("/data/d5")
+		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"data1\":\"a1\"}").post("/data/d5")
 		.then().assertThat().statusCode(204);
-		given().with().body("{\"auth_token\":\"token1243\",\"data2\":\"a2\"}").post("/data/d5")
+		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"data2\":\"a2\"}").post("/data/d5")
 		.then().assertThat().statusCode(204);
 		//send subscribe
 		Gson gs = new Gson();
@@ -73,11 +73,11 @@ public class HistoryTest {
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 
-		given().with().body("{\"auth_token\":\"token1243\",\"data1\":\"a1\"}").post("/data/d6")
+		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"data1\":\"a1\"}").post("/data/d6")
 		.then().assertThat().statusCode(204);
-		given().with().body("{\"auth_token\":\"token1243\",\"data2\":\"a2\"}").post("/data/d6")
+		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"data2\":\"a2\"}").post("/data/d6")
 		.then().assertThat().statusCode(204);
-		given().with().body("{\"auth_token\":\"token1243\",\"data1\":\"a3\"}").post("/data/d6")
+		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"data1\":\"a3\"}").post("/data/d6")
 		.then().assertThat().statusCode(204);
 		//skip two messages
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));

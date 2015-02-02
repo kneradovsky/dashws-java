@@ -18,18 +18,18 @@ public class WebServerTest {
 
 	@Test
 	public void invalidToken() {
-		given().with().body("{\"auth_token\":\"token1243\",\"data\":\"a\"}").post("/data/d1")
+		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"data\":\"a\"}").post("/data/d1")
 		.then().assertThat().statusCode(401);
 	}
 	
 	@Test
 	public void validToken() {
-		given().with().body("{\"auth_token\":\"token1243\",\"data\":\"a\"}").post("/data/d1")
+		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"data\":\"a\"}").post("/data/d1")
 		.then().assertThat().statusCode(204);
 	}
 	@Test
 	public void invalidData() {
-		given().with().body("{\"auth_token\":\"token1243\",\"data\":").post("/data/d1")
+		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"data\":").post("/data/d1")
 		.then().assertThat().statusCode(401);
 	}	
 }
