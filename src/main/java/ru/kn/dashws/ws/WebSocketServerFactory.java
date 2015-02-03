@@ -3,7 +3,9 @@ package ru.kn.dashws.ws;
 import java.lang.reflect.Field;
 
 public class WebSocketServerFactory {
+
 	public static Object getServer() {
+/*
 		try {
 		Class<?> single = ClassLoader.getSystemClassLoader().loadClass("ru.kn.dashws.ws.WebSocketServer");
 		Field instfield=single.getDeclaredField("inst");
@@ -19,6 +21,7 @@ public class WebSocketServerFactory {
 			e.printStackTrace();
 			return null;
 		}
-		
-	}
+*/
+		return WebSocketServer.getInstance();
+	}	
 }

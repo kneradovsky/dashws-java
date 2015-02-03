@@ -11,11 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.annotation.Resource;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +19,8 @@ import com.google.gson.JsonObject;
 
 public class WebSocketServer {
 	private static WebSocketServer inst;
-	static ReadWriteLock strwlock = new ReentrantReadWriteLock();
-	ReadWriteLock rwlock = new ReentrantReadWriteLock();
-	ReadWriteLock histrwlock = new ReentrantReadWriteLock();
+	final ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
+	final ReentrantReadWriteLock histrwlock = new ReentrantReadWriteLock();
 	AtomicInteger connidSource=new AtomicInteger(-1);
 	Map<Integer,ClientConnection> connections;
 	Map<String,List<Integer>> subscriptions;
@@ -40,57 +34,68 @@ public class WebSocketServer {
 		history=new HashMap<>();
 		logger.debug("constructing WebSocketServer");
 	}
-	public static WebSocketServer getInstance2() {
-		try {
-			//strwlock.writeLock().lock();
-			if(inst==null) {
-				inst=new WebSocketServer();
-
-			}
-			return inst;
-		} finally {
-			//strwlock.writeLock().unlock();
+	public static synchronized WebSocketServer getInstance() {
+		if(inst==null) {
+			inst=new WebSocketServer();
 		}
+		return inst;
 	}
 	
 	
 	public Integer add(ClientConnection conn) {
 		Integer connid=connidSource.incrementAndGet();
 		rwlock.writeLock().lock();
+		logger.debug("add, write lock get");
 		connections.put(connid,conn);
 		rwlock.writeLock().unlock();
+		logger.debug("add, write lock unlock");
 		return connid;
 	}
 	
 	public void remove(Integer connid) {
 		rwlock.writeLock().lock();
-		//remove from connections' map
-		connections.remove(connid);
-		//remove from each subscribers list
-		for(Entry<String,List<Integer>> subs : subscriptions.entrySet()) {
-			subs.getValue().remove(connid);
+		try {
+			logger.debug("remove, write lock lock");
+			//remove from connections' map
+			connections.remove(connid);
+			//remove from each subscribers list
+			for(Entry<String,List<Integer>> subs : subscriptions.entrySet()) {
+				subs.getValue().remove(connid);
+			}
+		} 
+		finally {
+			rwlock.writeLock().unlock();
+			logger.debug("remove, write lock unlock");
 		}
-		rwlock.writeLock().unlock();
 	}
 	
 	public List<JsonObject> subscribe(Integer connid,List<String> subs_ids) {
-		rwlock.writeLock().lock();
-		//create history excerpt for subs_ids
+		//rwlock.writeLock().lock();
+		logger.debug("subscribe, write lock lock");
 		List<JsonObject> hist=new LinkedList<JsonObject>();
+		try { 
+		//create history excerpt for subs_ids
+		
 		//for each subs id find its subscribers and add connid to that list
-		for(String subid : subs_ids) {
-			List<Integer> sublist=null;
-			if(!subscriptions.containsKey(subid)) {
-				sublist=new LinkedList<Integer>();
-				subscriptions.put(subid,sublist);
-			} else {
-				JsonObject stobj=getHistory(subid);
-				if(stobj!=null) hist.add(stobj); 
-				sublist=subscriptions.get(subid);
+			for(String subid : subs_ids) {
+				List<Integer> sublist=null;
+				if(!subscriptions.containsKey(subid)) {
+					sublist=new LinkedList<Integer>();
+					subscriptions.put(subid,sublist);
+				} else {
+					JsonObject stobj=getHistory(subid);
+					if(stobj!=null) hist.add(stobj); 
+					sublist=subscriptions.get(subid);
+				}
+				sublist.add(connid);
 			}
-			sublist.add(connid);
+		} finally {			
+			//rwlock.writeLock().unlock();
+			logger.debug("locks1:"+rwlock.getReadLockCount()+";"+rwlock.getQueueLength());
+			logger.debug("locks2:"+histrwlock.getReadLockCount()+";"+histrwlock.getQueueLength());
+			
+			logger.debug("subcscribe, write lock unlock");
 		}
-		rwlock.writeLock().unlock();
 		return hist;
 	}
 	
@@ -106,6 +111,7 @@ public class WebSocketServer {
 	public JsonObject updateHistory(String id,JsonObject newdata) {
 		try {
 			histrwlock.writeLock().lock();
+			logger.debug("updHist, write lock lock");
 			if(history.containsKey(id)) {
 				JsonObject olddata=history.get(id);
 				for(Entry<String,JsonElement> field : olddata.entrySet()) {
@@ -117,19 +123,23 @@ public class WebSocketServer {
 			logger.debug("updateHistory exception:", e);
 		} finally {
 			histrwlock.writeLock().unlock();
+			logger.debug("updHist, write lock unlock");
 		}
 		return newdata;
 	}
 	public void send(String id,JsonObject body,String target) {
+		body.addProperty("id", id);
 		if(target.equals("dashboards")) {
 			rwlock.readLock().lock();
 			for(Entry<Integer,ClientConnection> connentry: connections.entrySet()) {
 				final ClientConnection conn=connentry.getValue();
 				final JsonObject msgBody=body;
 				final String msgTarget=target;
+				
 				execsrv.submit(new Runnable() {
 					@Override
 					public void run() {
+						
 						String msg=conn.format_event(msgBody,msgTarget);
 						conn.sendText(msg);
 					}

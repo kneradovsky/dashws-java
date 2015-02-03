@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebInitParam;
@@ -18,12 +19,10 @@ import org.slf4j.LoggerFactory;
 import ru.kn.dashws.ws.WebSocketServer;
 import ru.kn.dashws.ws.WebSocketServerFactory;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -95,6 +94,7 @@ public class HttpEndpoint extends HttpServlet {
 					executor.submit(new Runnable()  {
 						@Override
 						public void run() {
+							obj.remove("auth_token");
 							wsserver.send(id,obj,target);
 						}
 					});

@@ -16,7 +16,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 
 @ClientEndpoint
-class WSClient {
+public class WSClient {
 	static final int TIMEOUT=5000;
 	static final String AUTH_TOKEN="token";
 	Semaphore onOpen,onMessage,onClose,onError;
@@ -37,7 +37,7 @@ class WSClient {
 	public void onClose(CloseReason reason) throws InterruptedException {
 		messages.put("onclose:"+reason.getReasonPhrase());
 	}
-	@OnError
+
 	public void onError(Throwable err) throws InterruptedException {
 		messages.put("onerror:"+err.getMessage());
 	}
