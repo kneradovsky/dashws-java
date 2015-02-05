@@ -34,7 +34,9 @@ public class HistoryTest {
 		container.connectToServer(client, new URI("ws://localhost:8080/websocket/connection"));
 		String message=null;
 		assertNotNull(message=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
-		assertTrue(message.startsWith("onopen"));		
+                assertTrue(message.startsWith("onopen"));		
+                //skip ack
+                assertNotNull(message=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 	}
 	
 	
@@ -48,13 +50,8 @@ public class HistoryTest {
 		//send subscribe
 		Gson gs = new Gson();
 		client.sendMessage("{\"type\": \"subscribe\",\"data\": {\"events\":[\"d5\"]}}");
-		Message msg=null;
 		LastEventsMessage submsg=null;
 		String strmsg=null;
-		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
-		msg=gs.fromJson(strmsg, Message.class);
-		assertThat(msg.type, equalTo("subscribe"));
-		assertThat(msg.data, hasEntry("result", "ok"));
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 		submsg = gs.fromJson(strmsg, LastEventsMessage.class);
 		assertThat(submsg.data.get(0), allOf(hasKey("data1"),hasKey("data2")));
@@ -69,8 +66,7 @@ public class HistoryTest {
 		client.sendMessage("{\"type\": \"subscribe\",\"data\": {\"events\":[\"d6\"]}}");
 		Message msg=null;
 		String strmsg=null;
-		//skip subscribe and last events messages
-		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
+		//skip last events messages
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 
 		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"data1\":\"a1\"}").post("/data/d6")

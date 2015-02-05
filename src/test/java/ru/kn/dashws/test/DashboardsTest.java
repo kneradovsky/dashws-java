@@ -34,7 +34,9 @@ public class DashboardsTest {
 		container.connectToServer(client, new URI("ws://localhost:8080/websocket/connection"));
 		String message=null;
 		assertNotNull(message=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
-		assertTrue(message.startsWith("onopen"));		
+		assertTrue(message.startsWith("onopen"));
+                //ack
+                assertNotNull(message=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 	}
 	
 
@@ -49,7 +51,6 @@ public class DashboardsTest {
 		Message msg=null;
 		String strmsg=null;
 		//skip subscribe and last events messages
-		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 
 		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"event\":\"reload\"}").post("/dashboards/*")
@@ -69,7 +70,6 @@ public class DashboardsTest {
 		Message msg=null;
 		String strmsg=null;
 		//skip subscribe and last events messages
-		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 
 		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"event\":\"reload\"}").post("/dashboards/db1")

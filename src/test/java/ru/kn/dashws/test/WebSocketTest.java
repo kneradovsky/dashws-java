@@ -36,7 +36,10 @@ public class WebSocketTest {
 		assertNotNull(message=client.messages.poll(5000, TimeUnit.MILLISECONDS));
 		assertTrue(message.startsWith("onopen"));
 		client.sendMessage("{data: a}}");
-		assertNotNull(message=client.messages.poll(5000, TimeUnit.MILLISECONDS));
+                //skip ack message
+                assertNotNull(message=client.messages.poll(5000, TimeUnit.MILLISECONDS));
+		//get error
+                assertNotNull(message=client.messages.poll(5000, TimeUnit.MILLISECONDS));
 		assertTrue(message.contains("error"));
 	}
 	
@@ -53,9 +56,9 @@ public class WebSocketTest {
 		Gson gs = new Gson();
 		Message msg = gs.fromJson(message, Message.class);
 		LastEventsMessage msg1 = gs.fromJson(message1, LastEventsMessage.class);
-		assertThat(msg.type, equalTo("subscribe"));
+		assertThat(msg.type, equalTo("ack"));
 		assertThat(msg.data, hasEntry("result", "ok"));
-		assertThat(msg1.type, equals("event"));
+		assertThat(msg1.type, equalTo("event"));
 		assertThat(msg1.data, notNullValue());
 	}
  

@@ -56,9 +56,9 @@ public class ClientConnection {
 	public void onOpen(Session session) {
 		try {
 			ses=session;
-			//wsserver=(WebSocketServer)WebSocketServerFactory.getServer();
-			//connid=wsserver.add(this);
-			//sendText("{\"type\":\"ack\",\"result\":\"ok\"}");
+			wsserver=(WebSocketServer)WebSocketServerFactory.getServer();
+			connid=wsserver.add(this);
+			sendText("{\"type\":\"ack\",\"data\":{\"result\":\"ok\"}}");
 		} catch(Throwable t) {
 			logException(t);
 		}
@@ -138,8 +138,6 @@ public class ClientConnection {
 		try {
 			logger.debug("sendText: in");
 			ses.getBasicRemote().sendText(msg);
-			//ses.getBasicRemote().getSendWriter().write(msg);
-			//ses.getBasicRemote().getSendWriter().flush();
 			logger.debug("ses:"+ses.getId());
 			logger.debug("sendText ThreadID:"+Thread.currentThread().getId());
 		} catch (IOException e) {
@@ -160,8 +158,8 @@ public class ClientConnection {
 			for(JsonElement jsid : events.getAsJsonArray()) {
 				subs_ids.add(jsid.getAsString());
 			}
-			List<JsonObject> history=new ArrayList<>();
-			//List<JsonObject> history=wsserver.subscribe(connid,subs_ids);
+			//List<JsonObject> history=new ArrayList<>();
+			List<JsonObject> history=wsserver.subscribe(connid,subs_ids);
 			JsonArray objdata=new JsonArray();
 			for(JsonObject objelem: history) 
 				objdata.add(objelem);

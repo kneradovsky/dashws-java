@@ -18,7 +18,7 @@ public class WebServerTest {
 
 	@Test
 	public void invalidToken() {
-		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"data\":\"a\"}").post("/data/d1")
+		given().with().body("{\"auth_token\":\"invalid_token\",\"data\":\"a\"}").post("/data/d1")
 		.then().assertThat().statusCode(401);
 	}
 	
@@ -30,6 +30,6 @@ public class WebServerTest {
 	@Test
 	public void invalidData() {
 		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"data\":").post("/data/d1")
-		.then().assertThat().statusCode(401);
+		.then().assertThat().statusCode(400);
 	}	
 }

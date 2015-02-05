@@ -111,11 +111,10 @@ public class WebSocketServer {
 	public JsonObject updateHistory(String id,JsonObject newdata) {
 		try {
 			histrwlock.writeLock().lock();
-			logger.debug("updHist, write lock lock");
 			if(history.containsKey(id)) {
 				JsonObject olddata=history.get(id);
 				for(Entry<String,JsonElement> field : olddata.entrySet()) {
-					if(olddata.has(field.getKey())) newdata.add(field.getKey(), field.getValue());
+					if(!newdata.has(field.getKey())) newdata.add(field.getKey(), field.getValue());
 				}
 			} 
 			history.put(id,newdata);
@@ -123,7 +122,6 @@ public class WebSocketServer {
 			logger.debug("updateHistory exception:", e);
 		} finally {
 			histrwlock.writeLock().unlock();
-			logger.debug("updHist, write lock unlock");
 		}
 		return newdata;
 	}

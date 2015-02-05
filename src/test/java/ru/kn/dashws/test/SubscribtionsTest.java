@@ -36,6 +36,8 @@ public class SubscribtionsTest {
 		String message=null;
 		assertNotNull(message=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 		assertTrue(message.startsWith("onopen"));		
+                //get ack
+                assertNotNull(message=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 	}
 	
 	@Test
@@ -45,7 +47,7 @@ public class SubscribtionsTest {
 		assertNotNull(message=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 		Gson gs = new Gson();
 		Message msg = gs.fromJson(message, Message.class);
-		assertThat(msg.type, equals("error"));
+		assertThat(msg.type, equalTo("error"));
 	}
 	
 	@Test
@@ -58,13 +60,8 @@ public class SubscribtionsTest {
 		//send subscribe
 		Gson gs = new Gson();
 		client.sendMessage("{\"type\": \"subscribe\",\"data\": {\"events\":[\"d2\",\"d1\"]}}");
-		Message msg=null;
 		LastEventsMessage submsg=null;
 		String strmsg=null;
-		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
-		msg=gs.fromJson(strmsg, Message.class);
-		assertThat(msg.type, equalTo("subscribe"));
-		assertThat(msg.data, hasEntry("result", "ok"));
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 		submsg = gs.fromJson(strmsg, LastEventsMessage.class);
 		assertTrue(submsg.data.size()>=2);
@@ -79,8 +76,7 @@ public class SubscribtionsTest {
 		client.sendMessage("{\"type\": \"subscribe\",\"data\": {\"events\":[\"d3\",\"d4\"]}}");
 		Message msg=null;
 		String strmsg=null;
-		//skip subscribe and last events messages
-		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
+		//skip events message
 		assertNotNull(strmsg=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 
 		given().with().body("{\"auth_token\":\""+WSClient.AUTH_TOKEN+"\",\"data\":\"a1\"}").post("/data/d3")
