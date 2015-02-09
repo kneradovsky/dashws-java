@@ -34,6 +34,7 @@ import com.google.gson.JsonParser;
 				"/data/*", 
 				"/dashboards/*"
 		}, 
+                loadOnStartup = 1,
 		initParams = { 
 				@WebInitParam(name = "auth_token", value = "token", description = "authentication token for accepting data")
 		})
@@ -42,7 +43,7 @@ public class HttpEndpoint extends HttpServlet {
     private String auth_token;
     Logger logger = LoggerFactory.getLogger(HttpEndpoint.class);
     final WebSocketServer wsserver;
-    ExecutorService executor;
+    ExecutorService executor= Executors.newCachedThreadPool();
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -63,7 +64,6 @@ public class HttpEndpoint extends HttpServlet {
 		} catch(NumberFormatException e) {
 			logger.debug("web_executors parameter is invalid, using default value");
 		};
-		executor=Executors.newFixedThreadPool(numexecs); 
 	}
 
 	/**

@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.slf4j.Logger;
@@ -43,13 +42,16 @@ public class WebSocketServer {
 	
 	
 	public Integer add(ClientConnection conn) {
-		Integer connid=connidSource.incrementAndGet();
+            Integer connid=connidSource.incrementAndGet();
+            try {
 		rwlock.writeLock().lock();
 		logger.debug("add, write lock get");
 		connections.put(connid,conn);
-		rwlock.writeLock().unlock();
 		logger.debug("add, write lock unlock");
-		return connid;
+            } finally {
+                rwlock.writeLock().unlock();
+            }
+            return connid;
 	}
 	
 	public void remove(Integer connid) {
@@ -72,15 +74,15 @@ public class WebSocketServer {
 	public List<JsonObject> subscribe(Integer connid,List<String> subs_ids) {
 		//rwlock.writeLock().lock();
 		logger.debug("subscribe, write lock lock");
-		List<JsonObject> hist=new LinkedList<JsonObject>();
+		List<JsonObject> hist=new LinkedList<>();
 		try { 
 		//create history excerpt for subs_ids
 		
 		//for each subs id find its subscribers and add connid to that list
 			for(String subid : subs_ids) {
-				List<Integer> sublist=null;
+				List<Integer> sublist;
 				if(!subscriptions.containsKey(subid)) {
-					sublist=new LinkedList<Integer>();
+					sublist=new LinkedList<>();
 					subscriptions.put(subid,sublist);
 				} else {
 					JsonObject stobj=getHistory(subid);
@@ -126,7 +128,7 @@ public class WebSocketServer {
 		return newdata;
 	}
 	public void send(String id,JsonObject body,String target) {
-		body.addProperty("id", id);
+		if(id!=null) body.addProperty("id", id);
 		if(target.equals("dashboards")) {
 			rwlock.readLock().lock();
 			for(Entry<Integer,ClientConnection> connentry: connections.entrySet()) {
