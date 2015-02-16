@@ -54,12 +54,12 @@ Request requirements:
 
 3. Server processes the request and responds the list of the latest events for the subscribed data sources:
 ```JSON
-{'type':'event','data':[{"id":"id1","value":"test","temp":"100F"},{"id":"id2","value":"shutdown","rpm":"0"}]}
+{"type":"event","data":[{"id":"id1","value":"test","temp":"100F"},{"id":"id2","value":"shutdown","rpm":"0"}]}
 ```
 
 4. On data event from datasource *dataid* the server sends the data to the clients that have subscribed for the events from that data source:
 ```JSON
-{'type':'event','data':{'id':'dataid','value': 'ok','temp':'200F'}}
+{"type":"event","data":{"id":"dataid","value": "ok","temp":"200F"}}
 ```
 The format of the data is defined by the datasource *dataid*
 
@@ -69,11 +69,11 @@ Packets marked by ">>>" are sent from the dashws server, packets marked by "<<<"
 ```JSON
 >>> {"type":"ack","result":"ok"}
 <<< {"type":"subscribe", "data":{"events":["id1","id2"]}}
->>> {'type':'event','data':[{"id":"id1","value":"test","temp":"100F"},{"id":"id2","value":"shutdown","rpm":"0"}]}
+>>> {"type":"event","data":[{"id":"id1","value":"test","temp":"100F"},{"id":"id2","value":"shutdown","rpm":"0"}]}
 .....
->>> {'type':'event','data':{'id':'id1','value': 'ok','temp':'200F'}}
+>>> {"type":"event","data":{"id":"id1","value": "ok","temp":"200F"}}
 .....
->>> {'type':'event','data':{'id':'id2','value': 'ok','rpm':'1010'}}
+>>> {"type":"event","data":{"id":"id2","value": "ok","rpm":"1010"}}
 .....
 ```
 
