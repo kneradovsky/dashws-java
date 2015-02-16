@@ -20,8 +20,8 @@ gradle assemble
 The dashws accepts the following context parameters:
 
 - **auth_token** Sets the authentication token for the post requests from data sources
-- **upstream*Name* ** Defines the WS upstream url, *Name* is the name of the upstream
-- **subscribe*Name* ** Defines the subscriptions for the upstream *Name* 
+- __upstream*Name*__ Defines the WS upstream url, *Name* is the name of the upstream
+- __subscribe*Name*__ Defines the subscriptions for the upstream *Name* 
 
 ## URL Mappings
 The dashws defines the following url mappings relative to its context
