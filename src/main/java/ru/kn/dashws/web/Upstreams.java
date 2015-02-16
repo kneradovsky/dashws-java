@@ -21,6 +21,7 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
@@ -58,7 +59,8 @@ public class Upstreams extends HttpServlet {
     */
     @Override
     public void init(ServletConfig config) throws ServletException {
-        Enumeration<String> parNames = config.getInitParameterNames();
+        ServletContext ctx=config.getServletContext();
+        Enumeration<String> parNames = ctx.getInitParameterNames();
         while(parNames.hasMoreElements()) {
             String parname=parNames.nextElement();
             if(!parname.startsWith("upstream")) continue;

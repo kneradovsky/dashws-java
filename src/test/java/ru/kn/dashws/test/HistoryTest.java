@@ -2,7 +2,7 @@ package ru.kn.dashws.test;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.hamcrest.core.AllOf.allOf;
@@ -18,18 +18,19 @@ import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
 import javax.websocket.WebSocketContainer;
 
-import org.junit.BeforeClass;
+
 import org.junit.Test;
 
 import com.google.gson.Gson;
+import org.junit.Before;
 
 
 public class HistoryTest {
-	private static WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-	private static WSClient client;
+	private WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+	private WSClient client;
 	
-	@BeforeClass
-	public static void connectWs() throws DeploymentException, IOException, URISyntaxException, InterruptedException {
+	@Before
+	public void connectWs() throws DeploymentException, IOException, URISyntaxException, InterruptedException {
 		client = new WSClient();
 		container.connectToServer(client, new URI("ws://localhost:8080/websocket/connection"));
 		String message=null;

@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author SBT-Neradovskiy-KL
+ * @author kneradovsky
  */
 @ClientEndpoint
 public class WSUpstreamConnection {

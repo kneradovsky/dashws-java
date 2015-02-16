@@ -23,6 +23,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import javax.servlet.ServletContext;
 
 
 /**
@@ -54,14 +55,9 @@ public class HttpEndpoint extends HttpServlet {
 	 * @see Servlet#init(ServletConfig)
 	 */
 	public void init(ServletConfig config) throws ServletException {
-		auth_token=config.getInitParameter("auth_token");
-		String numexecutors=config.getInitParameter("web_executors");
-		Integer numexecs=10;
-		try {
-			numexecs = Integer.parseInt(numexecutors);
-		} catch(NumberFormatException e) {
-			logger.debug("web_executors parameter is invalid, using default value");
-		};
+            ServletContext ctx = config.getServletContext();
+            auth_token=ctx.getInitParameter("auth_token");
+            logger.debug("Authtoken is: "+auth_token);
 	}
 
 	/**
