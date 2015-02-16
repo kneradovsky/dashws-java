@@ -33,7 +33,7 @@ import ru.kn.dashws.ws.WSUpstreamConnection;
 
 /**
  *
- * @author SBT-Neradovskiy-KL
+ * @author kneradovsky
  */
 @WebServlet(
     asyncSupported = true, 
@@ -42,8 +42,8 @@ import ru.kn.dashws.ws.WSUpstreamConnection;
     }, 
     loadOnStartup = 1,
     initParams = { 
-        @WebInitParam(name = "upstream1", value = "ws://10.68.195.104:4041/websocket/connection", description = ""),
-        @WebInitParam(name = "subscribe1", value = "id1,id2,id3", description = "")
+        //@WebInitParam(name = "upstream1", value = "ws://10.68.195.104:4041/websocket/connection", description = ""),
+        //@WebInitParam(name = "subscribe1", value = "id1,id2,id3", description = "")
     })
 public class Upstreams extends HttpServlet {
     

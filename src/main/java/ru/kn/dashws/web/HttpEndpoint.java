@@ -34,10 +34,8 @@ import com.google.gson.JsonParser;
 				"/data/*", 
 				"/dashboards/*"
 		}, 
-                loadOnStartup = 1,
-		initParams = { 
-				@WebInitParam(name = "auth_token", value = "token", description = "authentication token for accepting data")
-		})
+                loadOnStartup = 1
+		)
 public class HttpEndpoint extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     private String auth_token;
