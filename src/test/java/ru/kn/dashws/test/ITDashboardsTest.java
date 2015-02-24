@@ -24,23 +24,21 @@ import com.google.gson.Gson;
 import org.junit.Before;
 
 public class ITDashboardsTest {
-	private WebSocketContainer container = ContainerProvider
-			.getWebSocketContainer();
+	private WebSocketContainer container = ContainerProvider.getWebSocketContainer();
 	private WSClient client;
 
 	@Before
-	public void connectWs() throws DeploymentException, IOException,
-			URISyntaxException, InterruptedException {
+	public void connectWs() throws DeploymentException, IOException, URISyntaxException, InterruptedException {
 		client = new WSClient();
 		container.connectToServer(client, new URI("ws://localhost:8080/websocket/connection"));
 		String message = null;
-		assertNotNull(message = client.messages.poll(WSClient.TIMEOUT,TimeUnit.MILLISECONDS));
+		assertNotNull(message = client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 		assertTrue(message.startsWith("onopen"));
 		// ack
-		assertNotNull(message = client.messages.poll(WSClient.TIMEOUT,TimeUnit.MILLISECONDS));
-		//advertise
-		assertNotNull(message = client.messages.poll(WSClient.TIMEOUT,TimeUnit.MILLISECONDS));
-		
+		assertNotNull(message = client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
+		// advertise
+		assertNotNull(message = client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
+
 	}
 
 	@Test
@@ -51,19 +49,14 @@ public class ITDashboardsTest {
 		Message msg = null;
 		String strmsg = null;
 		// skip subscribe and last events messages
-		assertNotNull(strmsg = client.messages.poll(WSClient.TIMEOUT,
-				TimeUnit.MILLISECONDS));
+		assertNotNull(strmsg = client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 
-		given().with()
-				.body("{\"auth_token\":\"" + WSClient.AUTH_TOKEN
-						+ "\",\"event\":\"reload\"}").post("/dashboards/*")
-				.then().assertThat().statusCode(204);
-		assertNotNull(strmsg = client.messages.poll(WSClient.TIMEOUT,
-				TimeUnit.MILLISECONDS));
+		given().with().body("{\"auth_token\":\"" + WSClient.AUTH_TOKEN + "\",\"event\":\"reload\"}")
+				.post("/dashboards/*").then().assertThat().statusCode(204);
+		assertNotNull(strmsg = client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 		msg = gs.fromJson(strmsg, Message.class);
 		assertThat(msg.type, equalTo("dashboards"));
-		assertThat(msg.data,
-				allOf(hasKey("event"), hasKey("id"), hasEntry("id", "*")));
+		assertThat(msg.data, allOf(hasKey("event"), hasKey("id"), hasEntry("id", "*")));
 	}
 
 	@Test
@@ -76,18 +69,13 @@ public class ITDashboardsTest {
 		Message msg = null;
 		String strmsg = null;
 		// skip subscribe and last events messages
-		assertNotNull(strmsg = client.messages.poll(WSClient.TIMEOUT,
-				TimeUnit.MILLISECONDS));
+		assertNotNull(strmsg = client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 
-		given().with()
-				.body("{\"auth_token\":\"" + WSClient.AUTH_TOKEN
-						+ "\",\"event\":\"reload\"}").post("/dashboards/db1")
-				.then().assertThat().statusCode(204);
-		assertNotNull(strmsg = client.messages.poll(WSClient.TIMEOUT,
-				TimeUnit.MILLISECONDS));
+		given().with().body("{\"auth_token\":\"" + WSClient.AUTH_TOKEN + "\",\"event\":\"reload\"}")
+				.post("/dashboards/db1").then().assertThat().statusCode(204);
+		assertNotNull(strmsg = client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
 		msg = gs.fromJson(strmsg, Message.class);
 		assertThat(msg.type, equalTo("dashboards"));
-		assertThat(msg.data,
-				allOf(hasKey("event"), hasKey("id"), hasEntry("id", "db1")));
+		assertThat(msg.data, allOf(hasKey("event"), hasKey("id"), hasEntry("id", "db1")));
 	}
 }

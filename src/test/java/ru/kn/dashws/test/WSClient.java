@@ -45,6 +45,9 @@ public class WSClient {
 	public void sendMessage(String data) throws IOException {
 		sess.getBasicRemote().sendText(data);
 	}
+	public void close() throws IOException {
+		sess.close();
+	}
 }
 
 class Message { 
@@ -55,5 +58,10 @@ class Message {
 class LastEventsMessage {
 	String type;
 	List<Map<String,String>> data;
+}
+
+class AdvertisingMessage {
+	String type;
+	List<String> data;
 }
 

@@ -20,39 +20,34 @@ import org.junit.Test;
 
 import com.google.gson.Gson;
 
-
-
-
-
-
 public class ITWebSocketTest {
 	private WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-	
+
 	@Test
 	public void invalidJson() throws DeploymentException, IOException, URISyntaxException, InterruptedException {
 		WSClient client = new WSClient();
 		container.connectToServer(client, new URI("ws://localhost:8080/websocket/connection"));
-		String message=null;
-		assertNotNull(message=client.messages.poll(5000, TimeUnit.MILLISECONDS));
+		String message = null;
+		assertNotNull(message = client.messages.poll(5000, TimeUnit.MILLISECONDS));
 		assertTrue(message.startsWith("onopen"));
 		client.sendMessage("{data: a}}");
-                //skip ack message
-                assertNotNull(message=client.messages.poll(5000, TimeUnit.MILLISECONDS));
-		//get error
-                assertNotNull(message=client.messages.poll(5000, TimeUnit.MILLISECONDS));
+		// skip ack message
+		assertNotNull(message = client.messages.poll(5000, TimeUnit.MILLISECONDS));
+		// get error
+		assertNotNull(message = client.messages.poll(5000, TimeUnit.MILLISECONDS));
 		assertTrue(message.contains("error"));
 	}
-	
+
 	@Test
 	public void validJson() throws DeploymentException, IOException, URISyntaxException, InterruptedException {
 		WSClient client = new WSClient();
 		container.connectToServer(client, new URI("ws://localhost:8080/websocket/connection"));
-		String message=null,message1=null;
-		assertNotNull(message=client.messages.poll(5000, TimeUnit.MILLISECONDS));
+		String message = null, message1 = null;
+		assertNotNull(message = client.messages.poll(5000, TimeUnit.MILLISECONDS));
 		assertTrue(message.startsWith("onopen"));
 		client.sendMessage("{\"type\": \"subscribe\",\"data\":{\"events\":[\"id1\",\"id2\"]}}");
-		assertNotNull(message=client.messages.poll(5000, TimeUnit.MILLISECONDS));
-		assertNotNull(message1=client.messages.poll(5000, TimeUnit.MILLISECONDS));
+		assertNotNull(message = client.messages.poll(5000, TimeUnit.MILLISECONDS));
+		assertNotNull(message1 = client.messages.poll(5000, TimeUnit.MILLISECONDS));
 		Gson gs = new Gson();
 		Message msg = gs.fromJson(message, Message.class);
 		LastEventsMessage msg1 = gs.fromJson(message1, LastEventsMessage.class);
@@ -61,5 +56,5 @@ public class ITWebSocketTest {
 		assertThat(msg1.type, equalTo("event"));
 		assertThat(msg1.data, notNullValue());
 	}
- 
+
 }
