@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,8 +154,10 @@ public class WebSocketServer {
 						}
 					});
 				}
-			} else 
+			} else {
+				broadcastAdvertising(new String[] {id});
 				logger.debug("send: widget:"+id+" has no subscriptions");
+			}
 			rwlock.readLock().unlock();
 		}
 	}
@@ -172,5 +175,15 @@ public class WebSocketServer {
 		} finally {
 			rwlock.readLock().unlock();
 		}
+	}
+	public void broadcastAdvertising(String[] ids) {
+		String data = "["+Joiner.on("\",\"").skipNulls().join(ids)+"]";
+		final String msg="{\"type\":\"advertising\",\"data\":"+data+"}";
+		execsrv.submit(new Runnable() {public void run() {
+				try {
+					rwlock.readLock().lock();
+					for(ClientConnection conn : connections.values()) conn.sendText(msg);
+				} finally {rwlock.readLock().unlock();}
+			}});
 	}
 }
