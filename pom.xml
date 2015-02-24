@@ -28,6 +28,11 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>18.0</version>
+    </dependency>     
+    <dependency>
       <groupId>com.jayway.restassured</groupId>
       <artifactId>rest-assured</artifactId>
       <version>2.4.0</version>
@@ -54,9 +59,10 @@
   </dependencies>
   <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <skip.unit.tests>true</skip.unit.tests>
+      <skip.unit.tests>false</skip.unit.tests>
   </properties>
   <build>
+    <defaultGoal>verify</defaultGoal>    
     <pluginManagement>
       <plugins>
         <plugin>

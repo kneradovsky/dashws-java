@@ -59,6 +59,7 @@ public class ClientConnection {
 			wsserver=(WebSocketServer)WebSocketServerFactory.getServer();
 			connid=wsserver.add(this);
 			sendText("{\"type\":\"ack\",\"data\":{\"result\":\"ok\"}}");
+			wsserver.advertise(connid);
 		} catch(Throwable t) {
 			logException(t);
 		}
@@ -136,10 +137,7 @@ public class ClientConnection {
 	
 	public synchronized void sendText(String msg) {
 		try {
-			logger.debug("sendText: in");
 			ses.getBasicRemote().sendText(msg);
-			logger.debug("ses:"+ses.getId());
-			logger.debug("sendText ThreadID:"+Thread.currentThread().getId());
 		} catch (IOException e) {
 			logException(e);
 		} catch(Throwable t) {

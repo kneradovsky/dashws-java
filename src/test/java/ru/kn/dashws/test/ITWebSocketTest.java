@@ -25,7 +25,7 @@ import com.google.gson.Gson;
 
 
 
-public class WebSocketTest {
+public class ITWebSocketTest {
 	private WebSocketContainer container = ContainerProvider.getWebSocketContainer();
 	
 	@Test

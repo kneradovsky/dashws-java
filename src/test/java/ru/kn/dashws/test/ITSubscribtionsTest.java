@@ -21,10 +21,11 @@ import javax.websocket.WebSocketContainer;
 import org.junit.Test;
 
 import com.google.gson.Gson;
+
 import org.junit.Before;
 
 
-public class SubscribtionsTest {
+public class ITSubscribtionsTest {
 	private WebSocketContainer container = ContainerProvider.getWebSocketContainer();
 	private WSClient client;
 	
@@ -37,6 +38,8 @@ public class SubscribtionsTest {
 		assertTrue(message.startsWith("onopen"));		
                 //get ack
                 assertNotNull(message=client.messages.poll(WSClient.TIMEOUT, TimeUnit.MILLISECONDS));
+        		// skip advertising
+        		assertNotNull(message = client.messages.poll(WSClient.TIMEOUT,TimeUnit.MILLISECONDS));
 	}
 	
 	@Test

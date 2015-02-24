@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -13,6 +14,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -45,9 +48,7 @@ public class WebSocketServer {
             Integer connid=connidSource.incrementAndGet();
             try {
 		rwlock.writeLock().lock();
-		logger.debug("add, write lock get");
 		connections.put(connid,conn);
-		logger.debug("add, write lock unlock");
             } finally {
                 rwlock.writeLock().unlock();
             }
@@ -57,7 +58,6 @@ public class WebSocketServer {
 	public void remove(Integer connid) {
 		rwlock.writeLock().lock();
 		try {
-			logger.debug("remove, write lock lock");
 			//remove from connections' map
 			connections.remove(connid);
 			//remove from each subscribers list
@@ -67,18 +67,15 @@ public class WebSocketServer {
 		} 
 		finally {
 			rwlock.writeLock().unlock();
-			logger.debug("remove, write lock unlock");
 		}
 	}
 	
 	public List<JsonObject> subscribe(Integer connid,List<String> subs_ids) {
-		//rwlock.writeLock().lock();
-		logger.debug("subscribe, write lock lock");
 		List<JsonObject> hist=new LinkedList<>();
 		try { 
-		//create history excerpt for subs_ids
-		
-		//for each subs id find its subscribers and add connid to that list
+			//create history excerpt for subs_ids
+			rwlock.writeLock().lock();
+			//for each subs id find its subscribers and add connid to that list
 			for(String subid : subs_ids) {
 				List<Integer> sublist;
 				if(!subscriptions.containsKey(subid)) {
@@ -92,11 +89,7 @@ public class WebSocketServer {
 				sublist.add(connid);
 			}
 		} finally {			
-			//rwlock.writeLock().unlock();
-			logger.debug("locks1:"+rwlock.getReadLockCount()+";"+rwlock.getQueueLength());
-			logger.debug("locks2:"+histrwlock.getReadLockCount()+";"+histrwlock.getQueueLength());
-			
-			logger.debug("subcscribe, write lock unlock");
+			rwlock.writeLock().unlock();
 		}
 		return hist;
 	}
@@ -162,6 +155,21 @@ public class WebSocketServer {
 				}
 			} else 
 				logger.debug("send: widget:"+id+" has no subscriptions");
+			rwlock.readLock().unlock();
+		}
+	}
+	
+	public void advertise(Integer connid) {
+		try {
+			rwlock.readLock().lock();
+			if(!connections.containsKey(connid)) return;
+			histrwlock.readLock().lock();
+			Set<String> ids = history.keySet();
+			String data = "["+Joiner.on("\",\"").skipNulls().join(ids)+"]";
+			histrwlock.readLock().unlock();
+			String msg="{\"type\":\"advertising\",\"data\":"+data+"}";
+			connections.get(connid).sendText(msg);
+		} finally {
 			rwlock.readLock().unlock();
 		}
 	}

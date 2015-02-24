@@ -3,7 +3,7 @@ package ru.kn.dashws.test;
 import org.junit.Test;
 import static com.jayway.restassured.RestAssured.*;
 
-public class WebServerTest {
+public class ITWebServerTest {
 
 	@Test
 	public void inexistentRoute() {
