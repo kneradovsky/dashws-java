@@ -42,9 +42,10 @@ Request requirements:
 
 ### WebSocket clients 
 
-1. Just after client connects,  the server sends 'ack' response:
+1. Just after client connects,  the server sends 'ack' response and advertises the events that have been received already:
 ```JSON
 {"type":"ack","result":"ok"}
+{"type":"advertise","data":["id1","id2","id3"]}
 ```
 
 2. Client receives the 'ack' and sends subsribe request with list of the IDs of the data sources in the data.events property: 
@@ -62,6 +63,12 @@ Request requirements:
 {"type":"event","data":{"id":"dataid","value": "ok","temp":"200F"}}
 ```
 The format of the data is defined by the datasource *dataid*
+
+5. if server receives the event that has no subscriptions yet, then the server advertises that event:
+```JSON
+{"type":"advertise","data":["id6"]}
+```
+
 
 
 #### Sample dataflow.
